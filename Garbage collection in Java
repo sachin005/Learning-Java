@@ -4,3 +4,28 @@ Understanding memory management
 http://docs.oracle.com/cd/E13150_01/jrockit_jvm/jrockit/geninfo/diagnos/garbage_collect.html
 
 http://javadecodedquestions.blogspot.com/2012/12/java-memory-management.html
+better one, more detailed - http://javadecodedquestions.blogspot.com/2012/12/java-memory-management.html
+
+System.gc() - uggests that the Java Virtual Machine expend effort toward recycling unused objects in order to make the memory they
+currently occupy available for quick reuse
+But, it is always best to let JVM decide when to do garbage collection
+http://stackoverflow.com/questions/13855013/understanding-java-memory-management
+
+Garbage collector attempts to reclaim garbage or some memory occupied by objects that are no longer in use by a program.
+
+Memory is divided into 3 main areas:
+Young/Eden generation - for newly created objects
+Tenured generation - for old objects that survived minor GC
+Perm space - for class definition, meta data and String pools
+
+-- For JRockit JVM
+The Mark and Sweep model:
+
+
+******Extra stuff******
+Resources other than memory, such as network sockets, database handles, user interaction windows, and file and device descriptors, are
+not typically handled by garbage collection. Methods used to manage such resources, particularly destructors, may suffice to manage
+memory as well, leaving no need for GC. Some GC systems allow such other resources to be associated with a region of memory that, when
+collected, causes the other resource to be reclaimed; this is called finalization. Finalization may introduce complications limiting its
+usability, such as intolerable latency between disuse and reclaim of especially limited resources, or a lack of control over which thread
+performs the work of reclaiming.
