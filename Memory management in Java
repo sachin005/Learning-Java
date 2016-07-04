@@ -9,15 +9,33 @@ application runs.
 When the heap is full, garbage is collected. During garbage collection, objects that are no longer needed are removed to make space for
 new ones.
 
-NOTE: JVM uses more memory that just heap. For example, Java methods, thread stack and native handlers are allocated in memory other than
+NOTE: JVM uses more memory that just heap. For example, Java methods, thread stack and native handlers are allocated in memory other
+than
 the heap as well as JVM internal data structures.
 
 Two areas of heap:
-Young generation(space)/ nursery: part of the heap reserved for allocation of new objects. When this area is full, garbage collection is
+Young generation(space)/ nursery: part of the heap reserved for allocation of new objects. When this area is full, garbage collection
+
 performed by running a special young collection. Young collection moves objects that have lived long enough are moved to the old space,
 thus freeing up nursery space for new object allocation.
 The reason behind nursery is most objects are temporary and short-lived.
-A young collection is designed to be swift at finding newly allocated objects that are still alive and moving them away from the nursery.
+A young collection is designed to be swift at finding newly allocated objects that are still alive and moving them away from the
+nursery.
 A young collection frees memory much faster than an old collection or a single generational heap(heap without nursery).
-Keep area - In R27.2.0 and later releases, nursery has an area called keep area. This contains most recently allocated objects and is not
+Keep area - In R27.2.0 and later releases, nursery has an area called keep area. This contains most recently allocated objects and is
+not
 garbage collected. This prevents objects from being promoted just because they were allocated right before garbage collection.
+
+Old space: contains objects that are still in use. When old space is full, garbage is collected by a process called old collection.
+
+Object allocation:
+During object allocation, the Jockit JVM distinguishes between small and large objects.
+The limit for when an object is considered to be large depends on the JVM version, heap size, garbage collection stategy and the
+platform, but it is usually between 2 and 128 kB
+- Small objects are allocated in the Thread Local Area(TLA). TLA is a chunk of free memory taken from the heap given to a thread for
+  exclusive use. The thread can allocate objects in this area without synchronizing with other threads. When the TLA is full, the
+  thread requests new TLA. TLAs are reserved from the nursery if it exists else they are reserved from anywhere in the heap.
+  
+  Large objects that don’t fit inside a TLA are allocated directly on the heap. When a nursery is used, the large objects are allocated
+  directly in old space. Allocation of large objects requires more synchronization between the Java threads, although the JRockit JVM
+  uses a system of caches of free chunks of different sizes to reduce the need for synchronization and improve the allocation speed.
