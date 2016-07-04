@@ -1,0 +1,23 @@
+Memory Management in Java
+https://docs.oracle.com/cd/E13150_01/jrockit_jvm/jrockit/geninfo/diagnos/garbage_collect.html
+
+Memory management is process of allocating new objects and removing old objects to make space for new objects allocation.
+
+Heap and Nursery
+Java objects reside in an area called the heap. Heap is created when the JVM starts and may increase or decrease in size while the
+application runs.
+When the heap is full, garbage is collected. During garbage collection, objects that are no longer needed are removed to make space for
+new ones.
+
+NOTE: JVM uses more memory that just heap. For example, Java methods, thread stack and native handlers are allocated in memory other than
+the heap as well as JVM internal data structures.
+
+Two areas of heap:
+Young generation(space)/ nursery: part of the heap reserved for allocation of new objects. When this area is full, garbage collection is
+performed by running a special young collection. Young collection moves objects that have lived long enough are moved to the old space,
+thus freeing up nursery space for new object allocation.
+The reason behind nursery is most objects are temporary and short-lived.
+A young collection is designed to be swift at finding newly allocated objects that are still alive and moving them away from the nursery.
+A young collection frees memory much faster than an old collection or a single generational heap(heap without nursery).
+Keep area - In R27.2.0 and later releases, nursery has an area called keep area. This contains most recently allocated objects and is not
+garbage collected. This prevents objects from being promoted just because they were allocated right before garbage collection.
