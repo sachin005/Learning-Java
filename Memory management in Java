@@ -39,3 +39,57 @@ platform, but it is usually between 2 and 128 kB
   Large objects that don’t fit inside a TLA are allocated directly on the heap. When a nursery is used, the large objects are allocated
   directly in old space. Allocation of large objects requires more synchronization between the Java threads, although the JRockit JVM
   uses a system of caches of free chunks of different sizes to reduce the need for synchronization and improve the allocation speed.
+
+Garbage collection
+It is the process of freeing up space in the heap or nursery for allocation of new objects.
+
+Mark and sweep model:
+- Used by JRockit JVM for garbage collection of whole heap.
+- Two phases: Mark phase and sweep phase
+- Mark phase: In this phase, all the objects that are reachable from Java threads, native handlers and other root sources, as well as
+  the objects reachable from these objects are so on, are marked as alive. It marks all the objects in use and the rest is considered
+  as garbage.
+- Sweep phase: In this phase, the heap is traversed and the gaps between live objects are recorded in a free list and made availabe
+  for new object allocation.
+  
+  Types:
+  Mostly concurrent Mark and sweep: Allows threads to continue running during large portions of garbage collection. Threads do stop for
+  synchronization few times.
+  Four parts of mostly concurrent mark phase:
+  - Initial marking: when the root set of live objects is identified. Done when threads are paused.
+  - concurrent marking: where the references from the root objects are followed to find and mark the rest of the live objects in the
+    heap. Done when the threads are running.
+  - precleaning: where changes in the heap during concurrent marking phase are identified and any additional objects live are
+    found and marked. Done whlie the threads are running.
+  - final marking: where changes during the precleaning are identified and any additional live objects are found and marked. This is
+    done while Java threads are paused.
+  Four parts of mostly concurrent sweep phase:
+  - sweeping of one half of the heap. This is done while the threads are running and are allowed to allocate objects in the area that
+    is not being currently swept.
+  - a short pause to switch halves.
+  - sweeping of the other half of the heap. This is done while threads are still running and are allowed to allocate objects in the
+    area of the heap that was first swept.
+  - a short pause for synchronization and recording statistics.
+  
+  Parallel Mark and Sweep:
+  The parallel mark and sweep strategy (also called the parallel garbage collector) uses all available CPUs in the system for
+  performing the garbage collection as fast as possible. All Java threads are paused during the entire parallel garbage collection.
+
+Generational Garbage Collection
+When the nursery exists, it is garbage collected by a process known as young collection. A garbage collection stategy which uses
+nursery is called a generational garbage collection strategy or generational garbage collection.
+The young collector in JRockit JVM identifies and promotes all live objects outside the keep area to old space. This is done in
+paralled using all available CPUs. All threads are paused during young collection.
+
+Dynamic and static garbage collection strategies
+Dynamic:
+- throughput: optimizes garbage collector for maximum application throughput. This is the default mode.
+- pausetime: optimizes garbage collector for short times and pause times.
+- deterministic: optimizes the garbage collector for very short and deterministic pause times. Available only as part of Oracle JRockit
+  Real Time.
+
+Static:
+- singlepar: it is a single generational paralled garbage collector (same as parallel).
+- genpar: two-generational parallel garbage collector.
+- singlecon: single-generational mostly concurrent garbage collector.
+- gencon: two-generational mostly concurrent garbage collector.
