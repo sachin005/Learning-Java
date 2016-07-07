@@ -1,5 +1,6 @@
 What is a build automation tool?
 http://stackoverflow.com/questions/610732/what-is-build-automation-software-for-example-ant
+http://www.drdobbs.com/jvm/why-build-your-java-projects-with-gradle/240168608
 
 I thought that you're supposed to test your app, and when it is running you click the 'build' button in eclipse or through command-line
 java, and it makes a .jar file out of it? So why do you need to 'automate' this process?
